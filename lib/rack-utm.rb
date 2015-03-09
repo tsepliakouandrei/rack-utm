@@ -127,5 +127,6 @@ module Rack
                      :path => "/"}
       cookie_hash[:domain] = @cookie_domain if @cookie_domain
       Rack::Utils.set_cookie_header!(headers, key, cookie_hash)
+    end
   end
 end
