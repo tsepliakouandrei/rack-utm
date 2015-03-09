@@ -7,6 +7,8 @@ module Rack
   class Utm
 
     COOKIE_SOURCE   = "u_source"
+    COOKIE_SOURCE14   = "first_source14"
+    COOKIE_SOURCE30   = "first_source30"
     COOKIE_MEDIUM   = "u_medium"
     COOKIE_TERM     = "u_term"
     COOKIE_CONTENT  = "u_content"
@@ -109,12 +111,21 @@ module Rack
         COOKIE_TIME => time,
         COOKIE_LP => lp
       }.each do |key, value|
-          cookie_hash = {:value => value,
-                         :expires => expires,
-                         :path => "/"}
-          cookie_hash[:domain] = @cookie_domain if @cookie_domain
-          Rack::Utils.set_cookie_header!(headers, key, cookie_hash)
+          set_cookie_header(headers, key, value, expires)
       end 
+
+      if medium == 'cpc' || medium == 'cpm'
+        set_cookie_header(headers, key, COOKIE_SOURCE14, Time.now + 60*60*24*14)
+        set_cookie_header(headers, key, COOKIE_SOURCE30, Time.now + 60*60*24*30)
+      end
     end
+
+    protected
+    def set_cookie_header(headers, key, value, expires)
+      cookie_hash = {:value => value,
+                     :expires => expires,
+                     :path => "/"}
+      cookie_hash[:domain] = @cookie_domain if @cookie_domain
+      Rack::Utils.set_cookie_header!(headers, key, cookie_hash)
   end
 end
