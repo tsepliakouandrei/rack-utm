@@ -115,8 +115,8 @@ module Rack
       end 
 
       if medium == 'cpc' || medium == 'cpm'
-        set_cookie_header(headers, key, COOKIE_SOURCE14, Time.now + 60*60*24*14)
-        set_cookie_header(headers, key, COOKIE_SOURCE30, Time.now + 60*60*24*30)
+        set_cookie_header(headers, COOKIE_SOURCE14, source, Time.now + 60*60*24*14)
+        set_cookie_header(headers, COOKIE_SOURCE30, source, Time.now + 60*60*24*30)
       end
     end
 
