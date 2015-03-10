@@ -36,7 +36,7 @@ module Rack
         source, medium, term, content, campaign, from, time, lp = cookie_info(req)
       end
 
-      if params_tag && params_tag != cookie_tag
+      if params_tag
         if source
           if @allow_overwrite
             source, medium, term, content, campaign, from, time, lp = params_info(req)
