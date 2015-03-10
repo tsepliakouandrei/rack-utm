@@ -6,17 +6,17 @@ module Rack
   #
   class Utm
 
-    COOKIE_SOURCE   = "u_source"
-    COOKIE_SOURCE14   = "first_source14"
-    COOKIE_SOURCE30   = "first_source30"
-    COOKIE_MEDIUM   = "u_medium"
-    COOKIE_TERM     = "u_term"
-    COOKIE_CONTENT  = "u_content"
-    COOKIE_CAMPAIGN = "u_campaign"
+    COOKIE_SOURCE   = "utm_source"
+    COOKIE_SOURCE14 = "first_source14"
+    COOKIE_SOURCE30 = "first_source30"
+    COOKIE_MEDIUM   = "utm_medium"
+    COOKIE_TERM     = "utm_term"
+    COOKIE_CONTENT  = "utm_content"
+    COOKIE_CAMPAIGN = "utm_campaign"
     
-    COOKIE_FROM     = "u_from"
-    COOKIE_TIME     = "u_time"
-    COOKIE_LP       = "u_lp"
+    COOKIE_FROM     = "utm_from"
+    COOKIE_TIME     = "utm_time"
+    COOKIE_LP       = "utm_lp"
     
     def initialize(app, opts = {})
       @app = app
@@ -60,9 +60,7 @@ module Rack
 
       status, headers, body = @app.call(env)
 
-      if source != cookie_tag
-        bake_cookies(headers, source, medium, term, content, campaign, from, time, lp)
-      end
+      bake_cookies(headers, source, medium, term, content, campaign, from, time, lp)
 
       [status, headers, body]
     end
@@ -95,7 +93,6 @@ module Rack
         req.cookies[COOKIE_FROM],
         req.cookies[COOKIE_TIME],
         req.cookies[COOKIE_LP]
-
       ]
     end
 
@@ -114,8 +111,11 @@ module Rack
           set_cookie_header(headers, key, value, expires)
       end 
 
-      if medium == 'cpc' || medium == 'cpm'
+      if medium == 'cpc'
         set_cookie_header(headers, COOKIE_SOURCE14, source, Time.now + 60*60*24*14)
+      end
+
+      if medium == 'cpm'
         set_cookie_header(headers, COOKIE_SOURCE30, source, Time.now + 60*60*24*30)
       end
     end
