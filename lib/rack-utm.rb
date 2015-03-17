@@ -7,21 +7,28 @@ module Rack
   class Utm
 
     COOKIE_SOURCE   = "utm_source"
-    COOKIE_SOURCE14 = "first_source14"
-    COOKIE_SOURCE30 = "first_source30"
     COOKIE_MEDIUM   = "utm_medium"
     COOKIE_TERM     = "utm_term"
     COOKIE_CONTENT  = "utm_content"
     COOKIE_CAMPAIGN = "utm_campaign"
-    
     COOKIE_FROM     = "utm_from"
     COOKIE_TIME     = "utm_time"
     COOKIE_LP       = "utm_lp"
+
+    COOKIE_SOURCE_14   = "utm_source_14"
+    COOKIE_MEDIUM_14   = "utm_medium_14"
+    COOKIE_TERM_14     = "utm_term_14"
+    COOKIE_CONTENT_14  = "utm_content_14"
+    COOKIE_CAMPAIGN_14 = "utm_campaign_14"
+    COOKIE_FROM_14     = "utm_from_14"
+    COOKIE_TIME_14     = "utm_time_14"
+    COOKIE_LP_14       = "utm_lp_14"
     
     def initialize(app, opts = {})
       @app = app
       @key_param = "utm_source"
-      @cookie_ttl = opts[:ttl] || 60*60*24*30  # 30 days
+      @cookie_ttl_30 = opts[:ttl] || 60*60*24*30  # 30 days
+      @cookie_ttl_14 = opts[:ttl] || 60*60*24*14  # 14 days
       @cookie_domain = opts[:domain] || nil
       @allow_overwrite = opts[:overwrite].nil? ? true : opts[:overwrite] 
     end
@@ -98,8 +105,9 @@ module Rack
 
     protected
     def bake_cookies(headers, source, medium, term, content, campaign, from, time, lp)
-      expires = Time.now + @cookie_ttl
-      { COOKIE_SOURCE => source,
+      expires_30 = Time.now + @cookie_ttl_30
+      {
+        COOKIE_SOURCE => source,
         COOKIE_MEDIUM => medium,
         COOKIE_TERM => term,
         COOKIE_CONTENT => content,
@@ -108,15 +116,23 @@ module Rack
         COOKIE_TIME => time,
         COOKIE_LP => lp
       }.each do |key, value|
-          set_cookie_header(headers, key, value, expires)
-      end 
-
-      if medium == 'cpc'
-        set_cookie_header(headers, COOKIE_SOURCE14, source, Time.now + 60*60*24*14)
+          set_cookie_header(headers, key, value, expires_30)
       end
 
-      if medium == 'cpm'
-        set_cookie_header(headers, COOKIE_SOURCE30, source, Time.now + 60*60*24*30)
+      if medium == 'cpc' || medium == 'cpm'
+        expires_14 = Time.now + @cookie_ttl_14
+        {
+          COOKIE_SOURCE_14 => source,
+          COOKIE_MEDIUM_14 => medium,
+          COOKIE_TERM_14 => term,
+          COOKIE_CONTENT_14 => content,
+          COOKIE_CAMPAIGN_14 => campaign,
+          COOKIE_FROM_14 => from,
+          COOKIE_TIME_14 => time,
+          COOKIE_LP_14 => lp
+        }.each do |key, value|
+            set_cookie_header(headers, key, value, expires_14)
+        end
       end
     end
 
