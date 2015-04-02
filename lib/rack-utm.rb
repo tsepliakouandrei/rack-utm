@@ -67,7 +67,7 @@ module Rack
 
       status, headers, body = @app.call(env)
 
-      bake_cookies(headers, source, medium, term, content, campaign, from, time, lp)
+      bake_cookies(headers, source, medium, term, content, campaign, from, time, lp, req)
 
       [status, headers, body]
     end
@@ -104,7 +104,7 @@ module Rack
     end
 
     protected
-    def bake_cookies(headers, source, medium, term, content, campaign, from, time, lp)
+    def bake_cookies(headers, source, medium, term, content, campaign, from, time, lp, req)
       expires_30 = Time.now + @cookie_ttl_30
       {
         COOKIE_SOURCE => source,
@@ -119,7 +119,7 @@ module Rack
           set_cookie_header(headers, key, value, expires_30)
       end
 
-      if medium.present?
+      if medium.present? && req.cookies[COOKIE_SOURCE_14].blank?
         expires_14 = Time.now + @cookie_ttl_14
         {
           COOKIE_SOURCE_14 => source,
