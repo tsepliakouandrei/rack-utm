@@ -119,7 +119,7 @@ module Rack
           set_cookie_header(headers, key, value, expires_30)
       end
 
-      if medium == 'cpc' || medium == 'cpm'
+      if medium.present?
         expires_14 = Time.now + @cookie_ttl_14
         {
           COOKIE_SOURCE_14 => source,
